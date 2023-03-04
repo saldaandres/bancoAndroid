@@ -104,7 +104,7 @@
 
         <Button
             android:backgroundTint="@color/teal_700"
-            android:id="@+id/buttonSave"
+            android:id="@+id/buttonUpdate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Guardar"

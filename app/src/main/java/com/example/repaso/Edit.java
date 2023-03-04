@@ -2,11 +2,17 @@ package com.example.repaso;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class Edit extends AppCompatActivity {
     TextView username;
@@ -14,6 +20,7 @@ public class Edit extends AppCompatActivity {
     EditText password;
     RadioButton radioAdmin;
     RadioButton radioUser;
+    Button btnActualizar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,12 +32,46 @@ public class Edit extends AppCompatActivity {
         password = findViewById(R.id.editTextTextPassword);
         radioAdmin = findViewById(R.id.radioAdmin);
         radioUser = findViewById(R.id.radioUser);
+        btnActualizar = findViewById(R.id.buttonUpdate);
 
         Intent intent = getIntent();
         username.setText(intent.getStringExtra("username"));
         email.setText(intent.getStringExtra("email"));
         password.setText(intent.getStringExtra("password"));
         int role = intent.getIntExtra("role", -1);
-        radioUser.setChecked(role == 0);
+        radioAdmin.setChecked(role == 1);
+
+        btnActualizar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String passwordAsString = password.getText().toString();
+                String emailAsString = email.getText().toString();
+                int newRole = (radioUser.isChecked()) ? 0 : 1;
+                if (emailAsString.isEmpty() || passwordAsString.isEmpty()) {
+                    Toast.makeText(Edit.this, "El email y la contraseña no pueden estar vacios", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                updateUser(emailAsString, passwordAsString, newRole );
+
+            }
+        });
+
+    }
+
+    private void updateUser(String newEmail, String newPassword, int newRole) {
+        SQLiteOpenHelper sqLiteOpenHelper = new ClsUser(this, "dbUsers", null, 1);
+        SQLiteDatabase database = sqLiteOpenHelper.getReadableDatabase();
+
+        // actualizando la base de datos
+        ContentValues cv = new ContentValues();
+        cv.put("email", newEmail);
+        cv.put("password", newPassword);
+        cv.put("role", newRole);
+        String where = "username = ?";
+        String[] whereArgs = {getIntent().getStringExtra("username")};
+        database.update("users", cv, where, whereArgs);
+        database.close();
+        Toast.makeText(this, "Cliente actualizado con exito", Toast.LENGTH_SHORT).show();
+        finish();
     }
 }
