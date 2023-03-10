@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ public class Edit extends AppCompatActivity {
     RadioButton radioAdmin;
     RadioButton radioUser;
     Button btnActualizar;
+    ClsUser sqLite = new ClsUser(this, "dbUsers", null, 1);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +53,18 @@ public class Edit extends AppCompatActivity {
                     Toast.makeText(Edit.this, "El email y la contraseña no pueden estar vacios", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                updateUser(emailAsString, passwordAsString, newRole );
-
+                if (emailAsString.equals(intent.getStringExtra("email"))) {
+                    updateUser(emailAsString, passwordAsString, newRole);
+                    return;
+                }
+                SQLiteDatabase database = sqLite.getReadableDatabase();
+                String query = "SELECT email from users where email = '" + emailAsString + "'";
+                Cursor cursor = database.rawQuery(query, null);
+                if (cursor.moveToFirst()) {
+                    Toast.makeText(Edit.this, "Ese email no está disponible", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                updateUser(emailAsString, passwordAsString, newRole);
             }
         });
 

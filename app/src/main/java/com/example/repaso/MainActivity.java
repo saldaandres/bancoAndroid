@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), "Cliente creado con exito", Toast.LENGTH_SHORT).show();
     }
 
-    private boolean borrarUsuario (SQLiteDatabase database, Cursor cursor, String stringPassword) {
+    private void borrarUsuario (SQLiteDatabase database, Cursor cursor, String stringPassword) {
         String dbPassword = cursor.getString(1);
         String name = cursor.getString(0);
 
@@ -186,11 +186,9 @@ public class MainActivity extends AppCompatActivity {
             String query = "DELETE FROM users WHERE username = '"+ name + "'";
             database.execSQL(query);
             Toast.makeText(this, "Usuario eliminado", Toast.LENGTH_SHORT).show();
-            return true;
+            return;
         }
-
         Toast.makeText(this, "Clave incorrecta", Toast.LENGTH_SHORT).show();
-        return false;
     }
 
 }
